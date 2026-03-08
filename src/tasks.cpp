@@ -14,7 +14,8 @@ double EarthRopeGapMeters() {
 
 double PoolConcreteCostRubles(double pool_radius_m, double walkway_width_m,
                               double concrete_cost_per_m2) {
-  if (pool_radius_m < 0.0 || walkway_width_m < 0.0 || concrete_cost_per_m2 < 0.0) {
+  if (pool_radius_m < 0.0 || walkway_width_m < 0.0 ||
+      concrete_cost_per_m2 < 0.0) {
     throw std::invalid_argument("Input values must be non-negative");
   }
 
