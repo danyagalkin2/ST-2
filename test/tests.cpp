@@ -125,6 +125,24 @@ TEST(Circle, GetterValuesStayNonNegative) {
   EXPECT_GE(circle.getArea(), 0.0);
 }
 
+TEST(Circle, LargeRadiusProducesExpectedValues) {
+  const double radius = 1000.0;
+  Circle circle(radius);
+  EXPECT_NEAR(circle.getFerence(), 2.0 * std::acos(-1.0) * radius, kEps);
+  EXPECT_NEAR(circle.getArea(), std::acos(-1.0) * radius * radius, kEps);
+}
+
+TEST(Circle, SetAreaAndSetFerenceLeadToSameRadius) {
+  Circle from_area(1.0);
+  Circle from_ference(1.0);
+
+  from_area.setArea(25.0 * std::acos(-1.0));
+  from_ference.setFerence(10.0 * std::acos(-1.0));
+
+  EXPECT_NEAR(from_area.getRadius(), 5.0, kEps);
+  EXPECT_NEAR(from_ference.getRadius(), 5.0, kEps);
+}
+
 TEST(Tasks, EarthRopeGapFormula) {
   const double expected = 1.0 / (2.0 * std::acos(-1.0));
   EXPECT_NEAR(EarthRopeGapMeters(), expected, 1e-9);
@@ -147,6 +165,29 @@ TEST(Tasks, PoolConcreteCostZeroWhenWalkwayWidthZero) {
 
 TEST(Tasks, PoolFenceCostForZeroInputs) {
   EXPECT_NEAR(PoolFenceCostRubles(0.0, 0.0, 2000.0), 0.0, kEps);
+}
+
+TEST(Tasks, PoolConcreteCostScalesWithConcretePrice) {
+  const double cheap =
+      PoolConcreteCostRubles(3.0, 1.0, 1000.0);
+  const double expensive =
+      PoolConcreteCostRubles(3.0, 1.0, 2000.0);
+
+  EXPECT_NEAR(expensive, cheap * 2.0, kEps);
+}
+
+TEST(Tasks, PoolFenceCostScalesWithFencePrice) {
+  const double cheap = PoolFenceCostRubles(3.0, 1.0, 500.0);
+  const double expensive = PoolFenceCostRubles(3.0, 1.0, 1500.0);
+
+  EXPECT_NEAR(expensive, cheap * 3.0, kEps);
+}
+
+TEST(Tasks, WiderWalkwayIncreasesConcreteCost) {
+  const double narrow = PoolConcreteCostRubles(3.0, 1.0, 1000.0);
+  const double wide = PoolConcreteCostRubles(3.0, 2.0, 1000.0);
+
+  EXPECT_GT(wide, narrow);
 }
 
 TEST(Tasks, PoolConcreteCostThrowsForNegativeRadius) {
