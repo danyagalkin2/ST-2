@@ -150,15 +150,18 @@ TEST(Tasks, PoolFenceCostForZeroInputs) {
 }
 
 TEST(Tasks, PoolConcreteCostThrowsForNegativeRadius) {
-  EXPECT_THROW(PoolConcreteCostRubles(-3.0, 1.0, 1000.0), std::invalid_argument);
+  EXPECT_THROW(
+      PoolConcreteCostRubles(-3.0, 1.0, 1000.0), std::invalid_argument);
 }
 
 TEST(Tasks, PoolConcreteCostThrowsForNegativeWidth) {
-  EXPECT_THROW(PoolConcreteCostRubles(3.0, -1.0, 1000.0), std::invalid_argument);
+  EXPECT_THROW(
+      PoolConcreteCostRubles(3.0, -1.0, 1000.0), std::invalid_argument);
 }
 
 TEST(Tasks, PoolConcreteCostThrowsForNegativePrice) {
-  EXPECT_THROW(PoolConcreteCostRubles(3.0, 1.0, -1000.0), std::invalid_argument);
+  EXPECT_THROW(
+      PoolConcreteCostRubles(3.0, 1.0, -1000.0), std::invalid_argument);
 }
 
 TEST(Tasks, PoolFenceCostThrowsForNegativeRadius) {
