@@ -17,9 +17,9 @@ class Circle {
  private:
   static double pi();
 
-  double radius_;
-  double ference_;
-  double area_;
+  double radius;
+  double ference;
+  double area;
 };
 
 

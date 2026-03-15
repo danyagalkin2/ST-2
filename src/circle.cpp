@@ -4,50 +4,50 @@
 #include <cmath>
 #include <stdexcept>
 
-Circle::Circle(double radius) : radius_(0.0), ference_(0.0), area_(0.0) {
-  setRadius(radius);
+Circle::Circle(double radius_value) : radius(0.0), ference(0.0), area(0.0) {
+  setRadius(radius_value);
 }
 
-void Circle::setRadius(double radius) {
-  if (radius < 0.0) {
+void Circle::setRadius(double radius_value) {
+  if (radius_value < 0.0) {
     throw std::invalid_argument("Radius must be non-negative");
   }
 
-  radius_ = radius;
-  ference_ = 2.0 * pi() * radius_;
-  area_ = pi() * radius_ * radius_;
+  radius = radius_value;
+  ference = 2.0 * pi() * radius;
+  area = pi() * radius * radius;
 }
 
-void Circle::setFerence(double ference) {
-  if (ference < 0.0) {
+void Circle::setFerence(double ference_value) {
+  if (ference_value < 0.0) {
     throw std::invalid_argument("Circumference must be non-negative");
   }
 
-  ference_ = ference;
-  radius_ = ference_ / (2.0 * pi());
-  area_ = pi() * radius_ * radius_;
+  ference = ference_value;
+  radius = ference / (2.0 * pi());
+  area = pi() * radius * radius;
 }
 
-void Circle::setArea(double area) {
-  if (area < 0.0) {
+void Circle::setArea(double area_value) {
+  if (area_value < 0.0) {
     throw std::invalid_argument("Area must be non-negative");
   }
 
-  area_ = area;
-  radius_ = std::sqrt(area_ / pi());
-  ference_ = 2.0 * pi() * radius_;
+  area = area_value;
+  radius = std::sqrt(area / pi());
+  ference = 2.0 * pi() * radius;
 }
 
 double Circle::getRadius() const {
-  return radius_;
+  return radius;
 }
 
 double Circle::getFerence() const {
-  return ference_;
+  return ference;
 }
 
 double Circle::getArea() const {
-  return area_;
+  return area;
 }
 
 double Circle::pi() {

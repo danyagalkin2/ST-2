@@ -143,76 +143,108 @@ TEST(Circle, SetAreaAndSetFerenceLeadToSameRadius) {
   EXPECT_NEAR(from_ference.getRadius(), 5.0, kEps);
 }
 
+TEST(Circle, RadiusToFerenceToRadiusKeepsValue) {
+  Circle circle(9.25);
+  const double initial_radius = circle.getRadius();
+
+  circle.setFerence(circle.getFerence());
+
+  EXPECT_NEAR(circle.getRadius(), initial_radius, kEps);
+}
+
+TEST(Circle, RadiusToAreaToRadiusKeepsValue) {
+  Circle circle(4.75);
+  const double initial_radius = circle.getRadius();
+
+  circle.setArea(circle.getArea());
+
+  EXPECT_NEAR(circle.getRadius(), initial_radius, kEps);
+}
+
+TEST(Circle, FerenceAndAreaMatchSameRadius) {
+  Circle circle(11.0);
+  const double expected_ference = 22.0 * std::acos(-1.0);
+  const double expected_area = 121.0 * std::acos(-1.0);
+
+  EXPECT_NEAR(circle.getFerence(), expected_ference, kEps);
+  EXPECT_NEAR(circle.getArea(), expected_area, kEps);
+}
+
+TEST(Circle, RepeatedZeroAssignmentsStayStable) {
+  Circle circle(3.0);
+
+  circle.setRadius(0.0);
+  circle.setFerence(0.0);
+  circle.setArea(0.0);
+
+  EXPECT_NEAR(circle.getRadius(), 0.0, kEps);
+  EXPECT_NEAR(circle.getFerence(), 0.0, kEps);
+  EXPECT_NEAR(circle.getArea(), 0.0, kEps);
+}
+
 TEST(Tasks, EarthRopeGapFormula) {
   const double expected = 1.0 / (2.0 * std::acos(-1.0));
   EXPECT_NEAR(EarthRopeGapMeters(), expected, 1e-9);
 }
 
 TEST(Tasks, PoolConcreteCostMatchesManualCalculation) {
+  const PoolCosts costs = PoolCostsRubles();
   const double expected_area = std::acos(-1.0) * (4.0 * 4.0 - 3.0 * 3.0);
   const double expected_cost = expected_area * 1000.0;
-  EXPECT_NEAR(PoolConcreteCostRubles(3.0, 1.0, 1000.0), expected_cost, kEps);
+  EXPECT_NEAR(costs.concrete_cost, expected_cost, kEps);
 }
 
 TEST(Tasks, PoolFenceCostMatchesManualCalculation) {
+  const PoolCosts costs = PoolCostsRubles();
   const double expected = 2.0 * std::acos(-1.0) * 4.0 * 2000.0;
-  EXPECT_NEAR(PoolFenceCostRubles(3.0, 1.0, 2000.0), expected, kEps);
+  EXPECT_NEAR(costs.fence_cost, expected, kEps);
 }
 
-TEST(Tasks, PoolConcreteCostZeroWhenWalkwayWidthZero) {
-  EXPECT_NEAR(PoolConcreteCostRubles(3.0, 0.0, 1000.0), 0.0, kEps);
+TEST(Tasks, PoolConcreteCostIsPositive) {
+  const PoolCosts costs = PoolCostsRubles();
+  EXPECT_GT(costs.concrete_cost, 0.0);
 }
 
-TEST(Tasks, PoolFenceCostForZeroInputs) {
-  EXPECT_NEAR(PoolFenceCostRubles(0.0, 0.0, 2000.0), 0.0, kEps);
+TEST(Tasks, PoolFenceCostIsPositive) {
+  const PoolCosts costs = PoolCostsRubles();
+  EXPECT_GT(costs.fence_cost, 0.0);
 }
 
-TEST(Tasks, PoolConcreteCostScalesWithConcretePrice) {
-  const double cheap =
-      PoolConcreteCostRubles(3.0, 1.0, 1000.0);
-  const double expensive =
-      PoolConcreteCostRubles(3.0, 1.0, 2000.0);
-
-  EXPECT_NEAR(expensive, cheap * 2.0, kEps);
+TEST(Tasks, PoolFenceCostIsGreaterThanConcreteCost) {
+  const PoolCosts costs = PoolCostsRubles();
+  EXPECT_GT(costs.fence_cost, costs.concrete_cost);
 }
 
-TEST(Tasks, PoolFenceCostScalesWithFencePrice) {
-  const double cheap = PoolFenceCostRubles(3.0, 1.0, 500.0);
-  const double expensive = PoolFenceCostRubles(3.0, 1.0, 1500.0);
+TEST(Tasks, PoolTotalCostMatchesSumOfComponents) {
+  const PoolCosts costs = PoolCostsRubles();
+  const double expected_area = std::acos(-1.0) * (16.0 - 9.0);
+  const double expected_concrete = expected_area * 1000.0;
+  const double expected_fence = 2.0 * std::acos(-1.0) * 4.0 * 2000.0;
 
-  EXPECT_NEAR(expensive, cheap * 3.0, kEps);
+  EXPECT_NEAR(costs.concrete_cost + costs.fence_cost,
+              expected_concrete + expected_fence, kEps);
 }
 
-TEST(Tasks, WiderWalkwayIncreasesConcreteCost) {
-  const double narrow = PoolConcreteCostRubles(3.0, 1.0, 1000.0);
-  const double wide = PoolConcreteCostRubles(3.0, 2.0, 1000.0);
+TEST(Tasks, PoolCostsFunctionReturnsStableValues) {
+  const PoolCosts first = PoolCostsRubles();
+  const PoolCosts second = PoolCostsRubles();
 
-  EXPECT_GT(wide, narrow);
+  EXPECT_NEAR(first.concrete_cost, second.concrete_cost, kEps);
+  EXPECT_NEAR(first.fence_cost, second.fence_cost, kEps);
 }
 
-TEST(Tasks, PoolConcreteCostThrowsForNegativeRadius) {
-  EXPECT_THROW(
-      PoolConcreteCostRubles(-3.0, 1.0, 1000.0), std::invalid_argument);
+TEST(Tasks, PoolConcretePartMatchesDifferenceOfCircleAreas) {
+  const PoolCosts costs = PoolCostsRubles();
+  Circle pool(3.0);
+  Circle outer(4.0);
+
+  EXPECT_NEAR(costs.concrete_cost,
+              (outer.getArea() - pool.getArea()) * 1000.0, kEps);
 }
 
-TEST(Tasks, PoolConcreteCostThrowsForNegativeWidth) {
-  EXPECT_THROW(
-      PoolConcreteCostRubles(3.0, -1.0, 1000.0), std::invalid_argument);
-}
+TEST(Tasks, PoolFencePartMatchesOuterCircleFerence) {
+  const PoolCosts costs = PoolCostsRubles();
+  Circle outer(4.0);
 
-TEST(Tasks, PoolConcreteCostThrowsForNegativePrice) {
-  EXPECT_THROW(
-      PoolConcreteCostRubles(3.0, 1.0, -1000.0), std::invalid_argument);
-}
-
-TEST(Tasks, PoolFenceCostThrowsForNegativeRadius) {
-  EXPECT_THROW(PoolFenceCostRubles(-3.0, 1.0, 2000.0), std::invalid_argument);
-}
-
-TEST(Tasks, PoolFenceCostThrowsForNegativeWidth) {
-  EXPECT_THROW(PoolFenceCostRubles(3.0, -1.0, 2000.0), std::invalid_argument);
-}
-
-TEST(Tasks, PoolFenceCostThrowsForNegativePrice) {
-  EXPECT_THROW(PoolFenceCostRubles(3.0, 1.0, -2000.0), std::invalid_argument);
+  EXPECT_NEAR(costs.fence_cost, outer.getFerence() * 2000.0, kEps);
 }

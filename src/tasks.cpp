@@ -1,9 +1,14 @@
 // Copyright 2026 UNN-CS
 #include "tasks.h"
 
-#include <stdexcept>
-
 #include "circle.h"
+
+namespace {
+constexpr double kPoolRadiusMeters = 3.0;
+constexpr double kWalkwayWidthMeters = 1.0;
+constexpr double kConcreteCostPerSquareMeter = 1000.0;
+constexpr double kFenceCostPerMeter = 2000.0;
+}  // namespace
 
 double EarthRopeGapMeters() {
   constexpr double kEarthRadiusMeters = 6'378'100.0;
@@ -12,25 +17,13 @@ double EarthRopeGapMeters() {
   return earth.getRadius() - kEarthRadiusMeters;
 }
 
-double PoolConcreteCostRubles(double pool_radius_m, double walkway_width_m,
-                              double concrete_cost_per_m2) {
-  if (pool_radius_m < 0.0 || walkway_width_m < 0.0 ||
-      concrete_cost_per_m2 < 0.0) {
-    throw std::invalid_argument("Input values must be non-negative");
-  }
-
-  Circle pool(pool_radius_m);
-  Circle outer(pool_radius_m + walkway_width_m);
+PoolCosts PoolCostsRubles() {
+  Circle pool(kPoolRadiusMeters);
+  Circle outer(kPoolRadiusMeters + kWalkwayWidthMeters);
   const double walkway_area = outer.getArea() - pool.getArea();
-  return walkway_area * concrete_cost_per_m2;
-}
 
-double PoolFenceCostRubles(double pool_radius_m, double walkway_width_m,
-                           double fence_cost_per_m) {
-  if (pool_radius_m < 0.0 || walkway_width_m < 0.0 || fence_cost_per_m < 0.0) {
-    throw std::invalid_argument("Input values must be non-negative");
-  }
-
-  Circle outer(pool_radius_m + walkway_width_m);
-  return outer.getFerence() * fence_cost_per_m;
+  PoolCosts costs{};
+  costs.concrete_cost = walkway_area * kConcreteCostPerSquareMeter;
+  costs.fence_cost = outer.getFerence() * kFenceCostPerMeter;
+  return costs;
 }
