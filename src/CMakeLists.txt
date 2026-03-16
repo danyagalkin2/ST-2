@@ -1,13 +1,33 @@
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+set(header_path "${${PROJECT_NAME}_SOURCE_DIR}/include")
+set(header
+  ${header_path}/circle.h
+  ${header_path}/tasks.h)
+set(src
+  circle.cpp
+  tasks.cpp)
 
-add_executable(${PROJECT_NAME}.test
-  AllTests.cpp
-  tests.cpp)
-target_link_libraries(${PROJECT_NAME}.test
-  ${PROJECT_NAME} ${GTEST_BOTH_LIBRARIES} pthread)
-target_compile_definitions(${PROJECT_NAME}.test 
-  PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
+add_library(${PROJECT_NAME} SHARED
+  ${header}
+  ${src})
 
-install(TARGETS ${PROJECT_NAME}.test
-        DESTINATION "${tool_dest}")
+target_include_directories(${PROJECT_NAME}
+  PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
+         ${${PROJECT_NAME}_SOURCE_DIR}/include)
+target_link_libraries(${PROJECT_NAME}
+  pthread)
+
+add_executable(${PROJECT_NAME}.info main.cpp)
+target_include_directories(${PROJECT_NAME}.info
+  PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
+         ${${PROJECT_NAME}_SOURCE_DIR}/include)
+target_link_libraries(${PROJECT_NAME}.info
+  ${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME}
+        LIBRARY DESTINATION "${lib_dest}"
+        ARCHIVE DESTINATION "${lib_dest}"
+        COMPONENT library)
+install(TARGETS ${PROJECT_NAME}.info
+        RUNTIME DESTINATION "${tool_dest}"
+        COMPONENT library)
+install(FILES ${header} DESTINATION "${include_dest}")
