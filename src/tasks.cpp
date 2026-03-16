@@ -1,29 +1,36 @@
-// Copyright 2026 UNN-CS
+// Copyright 2022 UNN-CS
 #include "tasks.h"
-
+#include <cmath>
 #include "circle.h"
 
-namespace {
-constexpr double kPoolRadiusMeters = 3.0;
-constexpr double kWalkwayWidthMeters = 1.0;
-constexpr double kConcreteCostPerSquareMeter = 1000.0;
-constexpr double kFenceCostPerMeter = 2000.0;
-}  // namespace
+const double PI = 3.1415;
 
-double EarthRopeGapMeters() {
-  constexpr double kEarthRadiusMeters = 6'378'100.0;
-  Circle earth(kEarthRadiusMeters);
-  earth.setFerence(earth.getFerence() + 1.0);
-  return earth.getRadius() - kEarthRadiusMeters;
+double ropeGap(double earth_radius_km) {
+  double earth_radius_m = earth_radius_km * 1000.0;
+  Circle earth(earth_radius_m);
+  double new_ference = earth.getFerence() + 1.0;
+  Circle new_circle(0);
+  new_circle.setFerence(new_ference);
+  return new_circle.getRadius() - earth.getRadius();
 }
 
-PoolCosts PoolCostsRubles() {
-  Circle pool(kPoolRadiusMeters);
-  Circle outer(kPoolRadiusMeters + kWalkwayWidthMeters);
-  const double walkway_area = outer.getArea() - pool.getArea();
+double poolConcreteCost(double pool_radius_m, double walkway_width_m,
+                        double concrete_price_per_m2) {
+  Circle pool(pool_radius_m);
+  Circle outer(pool_radius_m + walkway_width_m);
+  double walkway_area = outer.getArea() - pool.getArea();
+  return walkway_area * concrete_price_per_m2;
+}
 
-  PoolCosts costs{};
-  costs.concrete_cost = walkway_area * kConcreteCostPerSquareMeter;
-  costs.fence_cost = outer.getFerence() * kFenceCostPerMeter;
-  return costs;
+double poolFenceCost(double pool_radius_m, double walkway_width_m,
+                     double fence_price_per_m) {
+  Circle outer(pool_radius_m + walkway_width_m);
+  double fence_length = outer.getFerence();
+  return fence_length * fence_price_per_m;
+}
+
+double poolTotalCost(double pool_radius_m, double walkway_width_m,
+                     double concrete_price_per_m2, double fence_price_per_m) {
+  return poolConcreteCost(pool_radius_m, walkway_width_m, concrete_price_per_m2)
+         + poolFenceCost(pool_radius_m, walkway_width_m, fence_price_per_m);
 }
