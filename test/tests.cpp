@@ -152,6 +152,42 @@ TEST(CircleTest, AreaAndFerenceMatchForRadiusThree) {
   EXPECT_NEAR(circle.getArea(), 28.2735, kEps);
 }
 
+TEST(CircleTest, SetFerenceToPiDiameterProducesRadiusTwo) {
+  Circle circle(1.0);
+
+  circle.setFerence(12.566);
+
+  EXPECT_NEAR(circle.getRadius(), 2.0, kEps);
+}
+
+TEST(CircleTest, SetAreaToPiProducesUnitRadius) {
+  Circle circle(5.0);
+
+  circle.setArea(kPi);
+
+  EXPECT_NEAR(circle.getRadius(), 1.0, kEps);
+  EXPECT_NEAR(circle.getFerence(), 2 * kPi, kEps);
+}
+
+TEST(CircleTest, SetRadiusPreservesExactAreaForRadiusFour) {
+  Circle circle(0.0);
+
+  circle.setRadius(4.0);
+
+  EXPECT_NEAR(circle.getArea(), 50.264, kEps);
+}
+
+TEST(CircleTest, SequentialUpdatesEndWithExpectedValues) {
+  Circle circle(6.0);
+
+  circle.setFerence(6.283);
+  circle.setRadius(2.0);
+
+  EXPECT_NEAR(circle.getRadius(), 2.0, kEps);
+  EXPECT_NEAR(circle.getFerence(), 12.566, kEps);
+  EXPECT_NEAR(circle.getArea(), 12.566, kEps);
+}
+
 TEST(RopeGapTest, ReturnsExpectedGapFromReadmeTask) {
   const double expectedGap = 1.0 / (2 * kPi);
 
