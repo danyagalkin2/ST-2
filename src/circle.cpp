@@ -1,29 +1,45 @@
 // Copyright 2022 UNN-CS
 #include "circle.h"
-#include <cmath>
 
-const double PI = 3.1415;
+#include <cmath>
+#include <stdexcept>
+
+namespace {
+constexpr double kPi = 3.1415;
+}
 
 Circle::Circle(double r) {
   setRadius(r);
 }
 
 void Circle::setRadius(double r) {
+  if (r < 0) {
+    throw std::invalid_argument("Radius must be non-negative");
+  }
+
   radius = r;
-  ference = 2 * PI * radius;
-  area = PI * radius * radius;
+  ference = 2 * kPi * radius;
+  area = kPi * radius * radius;
 }
 
 void Circle::setFerence(double f) {
+  if (f < 0) {
+    throw std::invalid_argument("Ference must be non-negative");
+  }
+
   ference = f;
-  radius = ference / (2 * PI);
-  area = PI * radius * radius;
+  radius = ference / (2 * kPi);
+  area = kPi * radius * radius;
 }
 
 void Circle::setArea(double a) {
+  if (a < 0) {
+    throw std::invalid_argument("Area must be non-negative");
+  }
+
   area = a;
-  radius = std::sqrt(area / PI);
-  ference = 2 * PI * radius;
+  radius = std::sqrt(area / kPi);
+  ference = 2 * kPi * radius;
 }
 
 double Circle::getRadius() const {

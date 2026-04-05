@@ -2,17 +2,19 @@
 #ifndef INCLUDE_TASKS_H_
 #define INCLUDE_TASKS_H_
 
-// Задача "Земля и верёвка"
-// earth_radius_km - радиус Земли в километрах
-// Возвращает величину зазора в метрах
-double ropeGap(double earth_radius_km);
+struct PoolCosts {
+  double concrete;
+  double fence;
+};
 
-// Задача "Бассейн" – отдельные составляющие
-double poolConcreteCost(double pool_radius_m, double walkway_width_m,
-                        double concrete_price_per_m2);
-double poolFenceCost(double pool_radius_m, double walkway_width_m,
-                     double fence_price_per_m);
-double poolTotalCost(double pool_radius_m, double walkway_width_m,
-                     double concrete_price_per_m2, double fence_price_per_m);
+// Задача "Земля и верёвка" из README.
+// Возвращает величину зазора в метрах для радиуса Земли 6378.1 км
+// и увеличения длины верёвки на 1 метр.
+double ropeGap();
+
+// Задача "Бассейн" из README.
+// Возвращает стоимости материалов для бетонной дорожки и ограды
+// для радиуса бассейна 3 м и ширины дорожки 1 м.
+PoolCosts poolCosts();
 
 #endif  // INCLUDE_TASKS_H_

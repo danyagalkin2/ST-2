@@ -1,36 +1,31 @@
 // Copyright 2022 UNN-CS
 #include "tasks.h"
-#include <cmath>
+
 #include "circle.h"
 
-const double PI = 3.1415;
-
-double ropeGap(double earth_radius_km) {
-  double earth_radius_m = earth_radius_km * 1000.0;
-  Circle earth(earth_radius_m);
-  double new_ference = earth.getFerence() + 1.0;
-  Circle new_circle(0);
-  new_circle.setFerence(new_ference);
-  return new_circle.getRadius() - earth.getRadius();
+namespace {
+constexpr double kEarthRadiusKm = 6378.1;
+constexpr double kRopeExtensionM = 1.0;
+constexpr double kPoolRadiusM = 3.0;
+constexpr double kWalkwayWidthM = 1.0;
+constexpr double kConcretePricePerM2 = 1000.0;
+constexpr double kFencePricePerM = 2000.0;
 }
 
-double poolConcreteCost(double pool_radius_m, double walkway_width_m,
-                        double concrete_price_per_m2) {
-  Circle pool(pool_radius_m);
-  Circle outer(pool_radius_m + walkway_width_m);
-  double walkway_area = outer.getArea() - pool.getArea();
-  return walkway_area * concrete_price_per_m2;
+double ropeGap() {
+  Circle earth(kEarthRadiusKm * 1000.0);
+  Circle rope(0.0);
+
+  rope.setFerence(earth.getFerence() + kRopeExtensionM);
+  return rope.getRadius() - earth.getRadius();
 }
 
-double poolFenceCost(double pool_radius_m, double walkway_width_m,
-                     double fence_price_per_m) {
-  Circle outer(pool_radius_m + walkway_width_m);
-  double fence_length = outer.getFerence();
-  return fence_length * fence_price_per_m;
-}
+PoolCosts poolCosts() {
+  Circle pool(kPoolRadiusM);
+  Circle outer(pool.getRadius() + kWalkwayWidthM);
 
-double poolTotalCost(double pool_radius_m, double walkway_width_m,
-                     double concrete_price_per_m2, double fence_price_per_m) {
-  return poolConcreteCost(pool_radius_m, walkway_width_m, concrete_price_per_m2)
-         + poolFenceCost(pool_radius_m, walkway_width_m, fence_price_per_m);
+  const double walkwayArea = outer.getArea() - pool.getArea();
+  const double fenceLength = outer.getFerence();
+
+  return {walkwayArea * kConcretePricePerM2, fenceLength * kFencePricePerM};
 }
